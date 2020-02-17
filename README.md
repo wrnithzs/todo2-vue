@@ -1,1 +1,2 @@
-# todo2-vue
+# todo-vue
+- App for management my to do list
