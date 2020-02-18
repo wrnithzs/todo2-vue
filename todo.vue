@@ -17,57 +17,74 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a @click="loadTodo()" class="nav-link" href="#">
+            <a v-on:click="loadTodo(), showCreate =false, showTodo =true" class="nav-link" href="#">
               Todo List
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+            <li class="nav-item ">
+            <a v-on:click="showCreate = true , showTodo = false" class="nav-link" href="#">
+              Create Todo
               <span class="sr-only">(current)</span>
             </a>
           </li>
         </ul>
       </div>
     </nav>
-    <br />
+    <br/>
+      <div v-if="showTodo">
       <div v-for="(todo, index) in todos" v-bind:key="todo.id" class="card mb-1">
         <div class="card-body">
-          <h5 class="card-title">Todo {{index}}</h5>
-          <p class="card-text">{{ todo.task }}</p>
-          <p class="card-text">{{ todo.timestamp }}</p>
+          <h5 class="card-title">Todo {{index+1}}</h5>
+          <p class="card-text">{{todo.task }}</p>
+          <p class="card-text">{{todo.timestamp }}</p>
           <div class="row">
-          <div class="col-auto-mr-auto">
-            <button type="button" class="btn btn-info">Edit</button>
-            &nbsp;
-            <button @click="removeTodo(todo.id)" type="button" class="btn btn-danger">Delete</button>
+            <div class="col-auto-mr-auto">
+              <button type="button" class="btn btn-info">Edit</button>
+              &nbsp;
+              <button @click="removeTodo(todo.id)" type="button" class="btn btn-danger">Delete</button>
+            </div>
+            <div class="col-auto">&nbsp;
+              <button class="btn btn-outline-info">Up</button>
+            </div>
           </div>
-          <div class="col-auto">
-            &nbsp;
-            <button class="btn btn-outline-info">Up</button>
-          </div>
-        </div>
         
         </div>
       </div>
-    <br />
+      </div>
+      <div v-if="showCreate">
+      <div class="form-group">
+        <label for="exampleInputEmail1">Input Todo</label>
+        <input type="text"  class="form-control"/>
+        <label >Descriptions</label>
+        <input type="text"  class="form-control"/>
+      </div>
+      <button type="button" class="btn btn-warning" v-on:click="loadTodo(),showCreate =false, showTodo =true">Cancel</button>&nbsp;
+      <button type="button" class="btn btn-primary" v-on:click="addTodo()">Save</button>
+      </div>
+    <br/>
 
 
   </div>
 </template>
 
 <!--firebase config-->
-<script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.8.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.7.0/firebase-firestore.js"></script>
 
 <script>
 import { firebase } from "@firebase/app";
 import "@firebase/firestore";
 
-var firebaseConfig = {
-  apiKey: "AIzaSyBGXFuW2-dgcqzr2Qi3FJHHUNgqchi6qNw",
-  authDomain: "mytodo-9c7de.firebaseapp.com",
-  databaseURL: "https://mytodo-9c7de.firebaseio.com",
-  projectId: "mytodo-9c7de",
-  storageBucket: "mytodo-9c7de.appspot.com",
-  messagingSenderId: "971316618674",
-  appId: "1:971316618674:web:d3644e81ae09d909f630ab"
-};
+  var firebaseConfig = {
+    apiKey: "AIzaSyDgf7t1b116sMNtXgJ0lnlIssVlYZAZvu4",
+    authDomain: "vue-todo-1c732.firebaseapp.com",
+    databaseURL: "https://vue-todo-1c732.firebaseio.com",
+    projectId: "vue-todo-1c732",
+    storageBucket: "vue-todo-1c732.appspot.com",
+    messagingSenderId: "599727970654",
+    appId: "1:599727970654:web:cd2027969f09f4dd6dd7cf"
+  };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -75,13 +92,16 @@ const db = firebase.firestore();
 export default {
   data() {
     return {
-      todos: []
-    };
+      todos: [],
+      newTask: " ",
+      showCreate: false,
+      showTodo: true,
+    }
   },
   firestore() {
     return {
       todos: db.collection("todos")
-    };
+    }
   },
   methods: {
     addTodo() {
@@ -93,9 +113,7 @@ export default {
     },
     loadTodo() {
       let todolist = [];
-      db.collection("todos")
-        .get()
-        .then(function(querySnapshot) {
+      db.collection("todos").get().then(function(querySnapshot) {
           querySnapshot.forEach(function(doc) {
             let todo = {
               id: doc.id,
@@ -116,8 +134,12 @@ export default {
           console.error("Error removing document: ", error);
         });
       this.loadTodo();
-    }
-  }
+    },
+  },
+  mounted() {
+    this.loadTodo();
+  },
+
 };
 </script>
 
